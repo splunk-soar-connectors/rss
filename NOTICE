@@ -1,0 +1,45 @@
+Splunk SOAR RSS
+Copyright 2021 Splunk Inc.
+
+Third-party Software Attributions:
+
+Library: sgmllib3k
+Version: 1.0.0
+License: BSD
+Unknown copyright
+
+Library: python-magic
+Version: 0.4.18
+License: MIT
+Copyright 2001-2014 Adam Hupp
+
+Library: beautifulsoup4
+Version: 4.9.1
+License: MIT
+Copyright 2004-2017 Leonard Richardson
+Copyright 2004-2019 Leonard Richardson
+Copyright 2018 Isaac Muse
+
+Library: pdfminer
+Version: 20191125
+License: MIT
+Copyright 2004-2019 Yusuke Shinyama
+
+Library: pudb
+Version: 2019.2
+License: MIT
+Copyright 2009 Andreas Kloeckner and contributors
+
+Library: feedparser
+Version: 6.0.2
+License: BSD 2
+Copyright 2002-2008 Copyright
+Copyright 2010-2020 Copyright
+Copyright 2010-2020 Kurt McKee <contactme@kurtmckee.org>
+Copyright 2002-2008 Mark Pilgrim
+Copyright 2004-2008 Mark Pilgrim
+
+Library: requests
+Version: 2.25.0
+License: Apache 2.0
+Kenneth Reitz
