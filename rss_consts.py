@@ -17,3 +17,4 @@ ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
 RSS_TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed"
 RSS_TEST_CONNECTIVITY_FAILED = "Test Connectivity Failed"
 RSS_ARTIFACTS_CONTAINERS_VALIDATION_FAILED = "Kindly provide a positive integer for max_containers and max_artifacts parameters"
+RSS_DEFAULT_TIMEOUT = 30
