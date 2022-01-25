@@ -15,24 +15,21 @@
 #
 #
 # Phantom App imports
+import hashlib
+import json
+import os
+import tempfile
+import urllib.request
+from time import mktime
+
+import feedparser
 import phantom.app as phantom
+import phantom.rules as ph_rules
 from phantom.base_connector import BaseConnector
 from phantom.vault import Vault
-import phantom.rules as ph_rules
+
 import rss_consts as rc
-
-# Local Import
 from parser_helper import parse_link_contents
-
-# Usage of the consts file is recommended
-# from rss_consts import *
-import os
-import json
-import hashlib
-import urllib.request
-import tempfile
-import feedparser
-from time import mktime
 
 
 class RetVal(tuple):
@@ -264,9 +261,10 @@ class RssConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
-    import pudb
     import argparse
+    import sys
+
+    import pudb
     import requests
 
     pudb.set_trace()

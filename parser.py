@@ -14,8 +14,9 @@
 # and limitations under the License.
 import re
 import socket
-import phantom.utils as ph_utils
+
 import phantom.app as phantom
+import phantom.utils as ph_utils
 
 _container_common = {
     "run_automation": False  # Don't run any playbooks, when this artifact is added
