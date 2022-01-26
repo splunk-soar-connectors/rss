@@ -12,20 +12,18 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
+import re
+from io import StringIO
 from parser import TextIOCParser
 
-import re
-import phantom.app as phantom
 import magic
+import phantom.app as phantom
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-from io import StringIO
-
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import TextConverter
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-
+from pdfminer.layout import LAParams
+from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
+from pdfminer.pdfpage import PDFPage
 
 MAGIC_FORMATS = [
     (re.compile('^PDF '), 'pdf'),

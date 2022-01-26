@@ -9,13 +9,14 @@
     "product_name": "RSS",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "license": "Copyright (c) 2017-2022 Splunk Inc.",
     "app_version": "2.0.2",
     "utctime_updated": "2022-01-07T21:12:16.000000Z",
     "package_name": "phantom_rss",
     "main_module": "rss_connector.py",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "feedparser-6.0.2"
     ],
@@ -48,7 +49,7 @@
             },
             {
                 "module": "pycryptodome",
-                "input_file": "wheels/pycryptodome-3.11.0-cp35-abi3-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/pycryptodome-3.13.0-cp35-abi3-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "python_magic",
@@ -64,11 +65,11 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/soupsieve-2.3-py3-none-any.whl"
+                "input_file": "wheels/soupsieve-2.3.1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+                "input_file": "wheels/urllib3-1.26.8-py2.py3-none-any.whl"
             }
         ]
     },
