@@ -2,16 +2,16 @@
 # RSS
 
 Publisher: Splunk  
-Connector Version: 2\.0\.1  
+Connector Version: 2\.0\.4  
 Product Vendor: Generic  
 Product Name: RSS  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.9\.39220  
+Minimum Product Version: 5\.1\.0  
 
 Ingest IOCs from an RSS Feed
 
-[comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2017-2021 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # "  Copyright (c) 2017-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
