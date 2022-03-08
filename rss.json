@@ -103,6 +103,12 @@
             "data_type": "boolean",
             "default": false,
             "order": 4
+        },
+        "ignore_cterrors": {
+            "description": "Ignore content type errors",
+            "data_type": "boolean",
+            "default": false,
+            "order": 5
         }
     },
     "actions": [

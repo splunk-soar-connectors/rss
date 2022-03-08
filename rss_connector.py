@@ -46,6 +46,7 @@ class RssConnector(BaseConnector):
         self._max_containers = None
         self._max_artifacts = None
         self._ignore_perrors = False
+        self._ignore_cterrors = False
         self._feed_url = None
         self.save_html = False
 
@@ -54,6 +55,9 @@ class RssConnector(BaseConnector):
         if self._feed.bozo == 1:
             ex_type = type(self._feed.bozo_exception)
             if self._ignore_perrors and ex_type is feedparser.CharacterEncodingOverride:
+                return phantom.APP_SUCCESS
+            # Some feeds are still served with improper Content Type
+            if self._ignore_cterrors and ex_type is feedparser.NonXMLContentType:
                 return phantom.APP_SUCCESS
             error_msg = self._feed.bozo_exception
             self.save_progress("Error reading feed: {}".format(error_msg))
@@ -241,6 +245,7 @@ class RssConnector(BaseConnector):
         self._max_containers = config.get('container_count', 0)
         self._max_artifacts = config.get('artifact_count', 0)
         self._ignore_perrors = config.get('ignore_perrors', False)
+        self._ignore_cterrors = config.get('ignore_cterrors', False)
         self.save_html = config.get("save_file", False)
 
         if not (self.is_positive_int(self._max_containers) and self.is_positive_int(self._max_artifacts)):
