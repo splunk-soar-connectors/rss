@@ -1,3 +1,3 @@
 **Unreleased**
 
-* Added asset parameter 'ignore_cterrors'
+* Added 'ignore_cterrors' asset configuration parameter
