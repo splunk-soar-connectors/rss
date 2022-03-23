@@ -90,7 +90,9 @@ class RssConnector(BaseConnector):
             return False
 
     def _handle_test_connectivity(self, param):
-        return self.set_status_save_progress(phantom.APP_SUCCESS, rc.RSS_TEST_CONNECTIVITY_PASSED)
+        self.debug_print("In action handler for action: {}".format(self.get_action_identifier()))
+        self.save_progress(rc.RSS_TEST_CONNECTIVITY_PASSED)
+        return self.set_status(phantom.APP_SUCCESS, rc.RSS_TEST_CONNECTIVITY_PASSED)
 
     def _cmp_with_last_checked_entry(self, entry, last_checked_entry):
         if mktime(entry.published_parsed) <= last_checked_entry['timestamp']:
