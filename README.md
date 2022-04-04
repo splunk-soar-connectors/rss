@@ -2,7 +2,7 @@
 # RSS
 
 Publisher: Splunk  
-Connector Version: 2\.0\.4  
+Connector Version: 2\.1\.0  
 Product Vendor: Generic  
 Product Name: RSS  
 Product Version Supported (regex): "\.\*"  
@@ -30,6 +30,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **container\_count** |  optional  | numeric | Maximum entries to parse \(0 for all\)
 **artifact\_count** |  optional  | numeric | Maximum artifacts to create per entry \(0 for all\)
 **ignore\_perrors** |  optional  | boolean | Ignore parsing errors
+**ignore\_cterrors** |  optional  | boolean | Ignore content type errors
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
