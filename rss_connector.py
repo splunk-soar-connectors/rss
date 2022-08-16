@@ -106,6 +106,10 @@ class RssConnector(BaseConnector):
             fd, path = tempfile.mkstemp(dir='/opt/phantom/vault/tmp', text=True)
         os.write(fd, html_file)
         os.close(fd)
+
+        # PAPP-26990 remove any relative paths from name
+        name = os.path.basename(name.strip('/'))
+
         success, message, vault_id = ph_rules.vault_add(container_id, path, name)
         if success:
             return phantom.APP_SUCCESS, None

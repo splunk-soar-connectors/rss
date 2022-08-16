@@ -10,11 +10,11 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2017-2022 Splunk Inc.",
-    "app_version": "2.1.0",
+    "app_version": "2.1.1",
     "utctime_updated": "2022-01-29T00:20:18.000000Z",
     "package_name": "phantom_rss",
     "main_module": "rss_connector.py",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "5.3.0",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
