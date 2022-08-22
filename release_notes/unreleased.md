@@ -1,2 +1,1 @@
 **Unreleased**
-* Fixed path traversal vulnerability in vault file name [PAPP-26990]

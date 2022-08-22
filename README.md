@@ -2,7 +2,7 @@
 # RSS
 
 Publisher: Splunk  
-Connector Version: 2\.1\.1  
+Connector Version: 2\.2\.0  
 Product Vendor: Generic  
 Product Name: RSS  
 Product Version Supported (regex): "\.\*"  
