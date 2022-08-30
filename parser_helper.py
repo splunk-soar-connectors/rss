@@ -20,10 +20,10 @@ import magic
 import phantom.app as phantom
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
-from pdfminer.pdfpage import PDFPage
+from pdfminer.six.converter import TextConverter
+from pdfminer.six.layout import LAParams
+from pdfminer.six.pdfinterp import PDFPageInterpreter, PDFResourceManager
+from pdfminer.six.pdfpage import PDFPage
 
 MAGIC_FORMATS = [
     (re.compile('^PDF '), 'pdf'),
