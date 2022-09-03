@@ -58,6 +58,7 @@ def _pdf_to_text(pdf_contents):
     try:
         pagenums = set()
         output = StringIO()
+        text = StringIO()
         pdf_contents = StringIO(pdf_contents)
         manager = PDFResourceManager()
         converter = TextConverter(manager, output, laparams=LAParams())

@@ -1,5 +1,5 @@
 beautifulsoup4==4.9.1
 feedparser==6.0.2
-PyPDF2==2.10.4
+pdfminer.six==20220524
 python-magic==0.4.18
 requests==2.25.0
