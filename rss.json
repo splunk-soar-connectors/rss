@@ -40,12 +40,8 @@
                 "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
             },
             {
-                "module": "charset_normalizer",
-                "input_file": "wheels/py3/charset_normalizer-2.1.1-py3-none-any.whl"
-            },
-            {
                 "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-37.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cryptography-38.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "feedparser",
@@ -57,7 +53,7 @@
             },
             {
                 "module": "pdfminer.six",
-                "input_file": "wheels/py3/pdfminer.six-20220524-py3-none-any.whl"
+                "input_file": "wheels/py3/pdfminer.six-20211012-py3-none-any.whl"
             },
             {
                 "module": "pycparser",
@@ -183,12 +179,8 @@
                 "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
             },
             {
-                "module": "charset_normalizer",
-                "input_file": "wheels/py3/charset_normalizer-2.1.1-py3-none-any.whl"
-            },
-            {
                 "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-37.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cryptography-38.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "feedparser",
@@ -200,7 +192,7 @@
             },
             {
                 "module": "pdfminer.six",
-                "input_file": "wheels/py3/pdfminer.six-20220524-py3-none-any.whl"
+                "input_file": "wheels/py3/pdfminer.six-20211012-py3-none-any.whl"
             },
             {
                 "module": "pycparser",
