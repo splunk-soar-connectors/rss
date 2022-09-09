@@ -1,2 +1,2 @@
 **Unreleased**
-* Removed pdf parsing support due to licensing issues [PAPP-27302]
+* Removed PDF parsing support due to licensing issues [PAPP-27302]
