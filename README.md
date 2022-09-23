@@ -2,11 +2,11 @@
 # RSS
 
 Publisher: Splunk  
-Connector Version: 2\.1\.0  
+Connector Version: 2\.2\.1  
 Product Vendor: Generic  
 Product Name: RSS  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.1\.0  
+Minimum Product Version: 5\.3\.3  
 
 Ingest IOCs from an RSS Feed
 

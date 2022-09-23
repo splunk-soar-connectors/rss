@@ -13,20 +13,14 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 import re
-from io import StringIO
 from parser import TextIOCParser
 
 import magic
 import phantom.app as phantom
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
-from pdfminer.pdfpage import PDFPage
 
 MAGIC_FORMATS = [
-    (re.compile('^PDF '), 'pdf'),
     (re.compile('^HTML '), 'html'),
     (re.compile('(ASCII|Unicode) text'), 'txt')
 ]
@@ -54,26 +48,6 @@ def _html_to_text(html_text):
     return phantom.APP_SUCCESS, None, text
 
 
-def _pdf_to_text(pdf_contents):
-    try:
-        pagenums = set()
-        output = StringIO()
-        pdf_contents = StringIO(pdf_contents)
-        manager = PDFResourceManager()
-        converter = TextConverter(manager, output, laparams=LAParams())
-        interpreter = PDFPageInterpreter(manager, converter)
-        for page in PDFPage.get_pages(pdf_contents, pagenums):
-            interpreter.process_page(page)
-        converter.close()
-        text = output.getvalue()
-        pdf_contents.close()
-        output.close()
-        return phantom.APP_SUCCESS, None, text
-    except Exception as e:
-        msg = "Error parsing pdf file: {}".format(str(e))
-        return phantom.APP_ERROR, msg, None
-
-
 def parse_link_contents(base_connector, resp_content):
     """ type: (BaseConnector, str) -> bool, str, dict """
     magic_str = magic.from_buffer(resp_content)
@@ -85,9 +59,7 @@ def parse_link_contents(base_connector, resp_content):
 
 def parse_file(base_connector, file_contents, file_type):
     """ type: (BaseConnector, ActionResult, str) -> bool, list """
-    if file_type == 'pdf':
-        ret_val, msg, raw_text = _pdf_to_text(file_contents)
-    elif file_type == 'html':
+    if file_type == 'html':
         ret_val, msg, raw_text = _html_to_text(file_contents)
     elif file_type == 'txt':
         raw_text = file_contents
