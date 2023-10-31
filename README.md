@@ -2,11 +2,11 @@
 # RSS
 
 Publisher: Splunk  
-Connector Version: 2\.2\.1  
+Connector Version: 2.2.2  
 Product Vendor: Generic  
 Product Name: RSS  
-Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.3\.3  
+Product Version Supported (regex): ".\*"  
+Minimum Product Version: 5.5.0  
 
 Ingest IOCs from an RSS Feed
 
@@ -25,12 +25,12 @@ The below configuration variables are required for this Connector to operate.  T
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
-**rss\_feed** |  required  | string | RSS Feed
-**save\_file** |  optional  | boolean | Save file to vault
-**container\_count** |  optional  | numeric | Maximum entries to parse \(0 for all\)
-**artifact\_count** |  optional  | numeric | Maximum artifacts to create per entry \(0 for all\)
-**ignore\_perrors** |  optional  | boolean | Ignore parsing errors
-**ignore\_cterrors** |  optional  | boolean | Ignore content type errors
+**rss_feed** |  required  | string | RSS Feed
+**save_file** |  optional  | boolean | Save file to vault
+**container_count** |  optional  | numeric | Maximum entries to parse (0 for all)
+**artifact_count** |  optional  | numeric | Maximum artifacts to create per entry (0 for all)
+**ignore_perrors** |  optional  | boolean | Ignore parsing errors
+**ignore_cterrors** |  optional  | boolean | Ignore content type errors
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
@@ -54,15 +54,15 @@ Ingest IOCs from an RSS Feed
 Type: **ingest**  
 Read only: **True**
 
-The action ingests RSS feeds where entries point to HTML or PDF documents only\.
+The action ingests RSS feeds where entries point to HTML or PDF documents only.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**container\_count** |  optional  | Maximum number of events to query for | numeric | 
-**artifact\_count** |  optional  | Maximum number of artifacts per container | numeric | 
-**start\_time** |  optional  | Parameter is ignored in this app | string | 
-**end\_time** |  optional  | Parameter is ignored in this app | string | 
+**container_count** |  optional  | Maximum number of events to query for | numeric | 
+**artifact_count** |  optional  | Maximum number of artifacts per container | numeric | 
+**start_time** |  optional  | Parameter is ignored in this app | string | 
+**end_time** |  optional  | Parameter is ignored in this app | string | 
 
 #### Action Output
 No Output

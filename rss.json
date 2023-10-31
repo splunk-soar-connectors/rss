@@ -9,12 +9,12 @@
     "product_name": "RSS",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2017-2022 Splunk Inc.",
-    "app_version": "2.2.1",
+    "license": "Copyright (c) 2017-2023 Splunk Inc.",
+    "app_version": "2.2.2",
     "utctime_updated": "2022-01-29T00:20:18.000000Z",
     "package_name": "phantom_rss",
     "main_module": "rss_connector.py",
-    "min_phantom_version": "5.3.3",
+    "min_phantom_version": "5.5.0",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
@@ -25,43 +25,15 @@
         "wheel": [
             {
                 "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
-            },
-            {
-                "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
-            },
-            {
-                "module": "cffi",
-                "input_file": "wheels/py36/cffi-1.15.1-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
-            },
-            {
-                "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-38.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py3/beautifulsoup4-4.11.1-py3-none-any.whl"
             },
             {
                 "module": "feedparser",
-                "input_file": "wheels/py3/feedparser-6.0.2-py3-none-any.whl"
-            },
-            {
-                "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
-            },
-            {
-                "module": "pycparser",
-                "input_file": "wheels/shared/pycparser-2.21-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/feedparser-6.0.10-py3-none-any.whl"
             },
             {
                 "module": "python_magic",
-                "input_file": "wheels/shared/python_magic-0.4.18-py2.py3-none-any.whl"
-            },
-            {
-                "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/python_magic-0.4.27-py2.py3-none-any.whl"
             },
             {
                 "module": "sgmllib3k",
@@ -70,10 +42,6 @@
             {
                 "module": "soupsieve",
                 "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             }
         ]
     },
@@ -163,28 +131,12 @@
                 "input_file": "wheels/py3/beautifulsoup4-4.11.1-py3-none-any.whl"
             },
             {
-                "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15.1-py3-none-any.whl"
-            },
-            {
-                "module": "charset_normalizer",
-                "input_file": "wheels/py3/charset_normalizer-2.1.1-py3-none-any.whl"
-            },
-            {
                 "module": "feedparser",
                 "input_file": "wheels/py3/feedparser-6.0.10-py3-none-any.whl"
             },
             {
-                "module": "idna",
-                "input_file": "wheels/py3/idna-3.3-py3-none-any.whl"
-            },
-            {
                 "module": "python_magic",
                 "input_file": "wheels/shared/python_magic-0.4.27-py2.py3-none-any.whl"
-            },
-            {
-                "module": "requests",
-                "input_file": "wheels/py3/requests-2.28.1-py3-none-any.whl"
             },
             {
                 "module": "sgmllib3k",
@@ -192,11 +144,7 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.5-py3-none-any.whl"
             }
         ]
     }
