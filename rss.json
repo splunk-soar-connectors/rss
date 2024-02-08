@@ -9,7 +9,7 @@
     "product_name": "RSS",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2017-2023 Splunk Inc.",
+    "license": "Copyright (c) 2017-2024 Splunk Inc.",
     "app_version": "2.2.2",
     "utctime_updated": "2022-01-29T00:20:18.000000Z",
     "package_name": "phantom_rss",
