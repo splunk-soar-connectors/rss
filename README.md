@@ -6,7 +6,7 @@ Connector Version: 2.2.2
 Product Vendor: Generic  
 Product Name: RSS  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.5.0  
+Minimum Product Version: 6.1.1  
 
 Ingest IOCs from an RSS Feed
 
