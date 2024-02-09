@@ -1,6 +1,6 @@
 # File: rss_connector.py
 #
-# Copyright (c) 2017-2022 Splunk Inc.
+# Copyright (c) 2017-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -100,10 +100,7 @@ class RssConnector(BaseConnector):
         return False
 
     def _save_html(self, html_file, name, container_id):
-        if hasattr(Vault, 'get_vault_tmp_dir'):
-            fd, path = tempfile.mkstemp(dir=Vault.get_vault_tmp_dir(), text=True)
-        else:
-            fd, path = tempfile.mkstemp(dir='/opt/phantom/vault/tmp', text=True)
+        fd, path = tempfile.mkstemp(dir=Vault.get_vault_tmp_dir(), text=True)
         os.write(fd, html_file)
         os.close(fd)
 
@@ -316,7 +313,8 @@ if __name__ == '__main__':
             headers['Referer'] = 'https://127.0.0.1/login'
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=verify, data=data, headers=headers, timeout=rc.RSS_DEFAULT_TIMEOUT)
+            r2 = requests.post("https://127.0.0.1/login", verify=verify, data=data, headers=headers,
+                               timeout=rc.RSS_DEFAULT_TIMEOUT)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
