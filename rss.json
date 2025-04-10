@@ -21,30 +21,6 @@
         "feedparser-6.0.2"
     ],
     "app_wizard_version": "1.0.0",
-    "pip_dependencies": {
-        "wheel": [
-            {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.11.1-py3-none-any.whl"
-            },
-            {
-                "module": "feedparser",
-                "input_file": "wheels/py3/feedparser-6.0.9-py3-none-any.whl"
-            },
-            {
-                "module": "python_magic",
-                "input_file": "wheels/shared/python_magic-0.4.27-py2.py3-none-any.whl"
-            },
-            {
-                "module": "sgmllib3k",
-                "input_file": "wheels/py3/sgmllib3k-1.0.0-py3-none-any.whl"
-            },
-            {
-                "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
-            }
-        ]
-    },
     "configuration": {
         "rss_feed": {
             "description": "RSS Feed",
@@ -127,10 +103,6 @@
     "pip39_dependencies": {
         "wheel": [
             {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.11.1-py3-none-any.whl"
-            },
-            {
                 "module": "feedparser",
                 "input_file": "wheels/py3/feedparser-6.0.9-py3-none-any.whl"
             },
@@ -141,10 +113,6 @@
             {
                 "module": "sgmllib3k",
                 "input_file": "wheels/py3/sgmllib3k-1.0.0-py3-none-any.whl"
-            },
-            {
-                "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.5-py3-none-any.whl"
             }
         ]
     }
