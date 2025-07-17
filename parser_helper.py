@@ -60,6 +60,8 @@ def parse_file(base_connector, file_contents, file_type):
     if file_type == "html":
         ret_val, msg, raw_text = _html_to_text(file_contents)
     elif file_type == "txt":
+        ret_val = phantom.APP_SUCCESS
+        msg = None
         raw_text = file_contents
     else:
         return phantom.APP_ERROR, "Link is an invalid file type", None
