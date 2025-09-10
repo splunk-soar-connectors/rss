@@ -1,9 +1,9 @@
 # RSS
 
-Publisher: Splunk \
-Connector Version: 2.2.3 \
-Product Vendor: Generic \
-Product Name: RSS \
+Publisher: Splunk <br>
+Connector Version: 2.2.3 <br>
+Product Vendor: Generic <br>
+Product Name: RSS <br>
 Minimum Product Version: 6.1.1
 
 Ingest IOCs from an RSS Feed
@@ -27,14 +27,14 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
 [on poll](#action-on-poll) - Ingest IOCs from an RSS Feed
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -49,7 +49,7 @@ No Output
 
 Ingest IOCs from an RSS Feed
 
-Type: **ingest** \
+Type: **ingest** <br>
 Read only: **True**
 
 The action ingests RSS feeds where entries point to HTML or PDF documents only.
