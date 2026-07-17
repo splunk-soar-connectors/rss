@@ -149,15 +149,10 @@ class RssConnector(BaseConnector):
 
         self.save_progress(
             "Parsing {} entries from {}".format(
-                "all" if self._max_containers == 0 else f"latest {self._max_containers}", self._feed["feed"]["title"]
+                "all" if self._max_containers == 0 else f"up to {self._max_containers} new", self._feed["feed"]["title"]
             )
         )
         self.save_progress("Saving {} artifacts per entry".format("all" if self._max_artifacts == 0 else self._max_artifacts))
-
-        if self._max_containers:
-            entries = self._feed.entries[0 : self._max_containers]
-        else:
-            entries = self._feed.entries
 
         try:
             last_checked_entry = self._state["last_checked_entry"]
@@ -168,15 +163,13 @@ class RssConnector(BaseConnector):
             if last_checked_entry["feed_url"] != self._feed_url:
                 last_checked_entry = {"timestamp": 0.0, "feed_url": self._feed_url}
 
-        new_entries = []
-        for entry in entries:
-            if self._cmp_with_last_checked_entry(entry, last_checked_entry):
-                break
-            new_entries.append(entry)
+        new_entries = [entry for entry in self._feed.entries if not self._cmp_with_last_checked_entry(entry, last_checked_entry)]
+        new_entries.sort(key=lambda entry: mktime(entry.published_parsed))
+        if self._max_containers:
+            new_entries = new_entries[: self._max_containers]
 
-        # Reverse so latest article shows up first
-        new_entries = list(reversed(new_entries))
-
+        last_successful_entry = None
+        failure_message = None
         for entry in new_entries:
             container = {"name": entry.title}
 
@@ -189,13 +182,15 @@ class RssConnector(BaseConnector):
             except Exception as e:
                 self.debug_print(f"Cannot read: {entry.link}")
                 self.debug_print(f"Exception: {e!s}")
-                continue
+                failure_message = f"Error retrieving link: {entry.link}"
+                break
 
             ret_val, msg, artifacts = parse_link_contents(self, resp_content)
             if phantom.is_fail(ret_val):
                 self.save_progress(f"Error processing link: {entry.link}")
                 self.save_progress(f"Error: {msg}")
-                continue
+                failure_message = f"Error processing link: {entry.link}"
+                break
 
             if self._max_artifacts:
                 # We are also going to add the link as an artifact
@@ -212,17 +207,24 @@ class RssConnector(BaseConnector):
 
             ret_val, msg, cid = self.save_container(container)
             if phantom.is_fail(ret_val):
-                return self.set_status(phantom.APP_ERROR, f"Error saving container: {msg}")
+                failure_message = f"Error saving container: {msg}"
+                break
 
             if self.save_html:
                 resp, msg = self._save_html(resp_content, entry.title, cid)
                 if phantom.is_fail(resp):
-                    return self.set_status(phantom.APP_ERROR, f"Error saving file to vault: {msg}")
+                    failure_message = f"Error saving file to vault: {msg}"
+                    break
+
+            last_successful_entry = entry
 
         if not self.is_poll_now():
-            if len(new_entries) > 0:
-                last_checked_entry["timestamp"] = mktime(new_entries[-1].published_parsed)
+            if last_successful_entry is not None:
+                last_checked_entry["timestamp"] = mktime(last_successful_entry.published_parsed)
                 self._state["last_checked_entry"] = last_checked_entry
+
+        if failure_message:
+            return self.set_status(phantom.APP_ERROR, failure_message)
 
         return self.set_status(phantom.APP_SUCCESS)
 
