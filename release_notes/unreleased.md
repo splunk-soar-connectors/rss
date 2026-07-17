@@ -1,3 +1,3 @@
 **Unreleased**
 
-* Updated development tooling for connector maintenance.
+* Restricted feed-supplied article retrieval to public HTTP and HTTPS destinations.

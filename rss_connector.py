@@ -16,9 +16,12 @@
 #
 # Phantom App imports
 import hashlib
+import ipaddress
 import json
 import os
+import socket
 import tempfile
+import urllib.parse
 import urllib.request
 from time import mktime
 
@@ -35,6 +38,28 @@ from parser_helper import parse_link_contents
 class RetVal(tuple):
     def __new__(cls, val1, val2):
         return tuple.__new__(RetVal, (val1, val2))
+
+
+def _validate_public_http_url(url):
+    parsed_url = urllib.parse.urlsplit(url)
+    if parsed_url.scheme not in {"http", "https"}:
+        raise ValueError("URL must use HTTP or HTTPS")
+    if not parsed_url.hostname or parsed_url.username or parsed_url.password:
+        raise ValueError("URL must contain a hostname without credentials")
+
+    try:
+        addresses = socket.getaddrinfo(parsed_url.hostname, parsed_url.port, type=socket.SOCK_STREAM)
+    except (OSError, ValueError) as e:
+        raise ValueError("URL hostname could not be resolved") from e
+
+    if not addresses or any(not ipaddress.ip_address(address[4][0]).is_global for address in addresses):
+        raise ValueError("URL hostname must resolve only to public addresses")
+
+
+class _PublicHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        _validate_public_http_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 class RssConnector(BaseConnector):
@@ -157,8 +182,10 @@ class RssConnector(BaseConnector):
 
             try:
                 # Get html page
+                _validate_public_http_url(entry.link)
                 request = urllib.request.Request(entry.link, headers={"User-Agent": "Chrome 41.0.2227.0"})
-                resp_content = urllib.request.urlopen(request).read()
+                opener = urllib.request.build_opener(_PublicHTTPRedirectHandler())
+                resp_content = opener.open(request).read()
             except Exception as e:
                 self.debug_print(f"Cannot read: {entry.link}")
                 self.debug_print(f"Exception: {e!s}")
