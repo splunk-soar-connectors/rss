@@ -1,6 +1,6 @@
 # File: rss_connector.py
 #
-# Copyright (c) 2017-2025 Splunk Inc.
+# Copyright (c) 2017-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ class RssConnector(BaseConnector):
         # PAPP-26990 remove any relative paths from name
         name = os.path.basename(name.strip("/"))
 
-        success, message, vault_id = ph_rules.vault_add(container_id, path, name)
+        success, message, _vault_id = ph_rules.vault_add(container_id, path, name)
         if success:
             return phantom.APP_SUCCESS, None
         return phantom.APP_ERROR, message
