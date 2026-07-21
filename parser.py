@@ -57,7 +57,10 @@ IPV6_REGEX += (
 
 
 def _extract_domain_from_url(url):
-    domain = phantom.get_host_from_url(url)
+    try:
+        domain = phantom.get_host_from_url(url)
+    except ValueError:
+        return None
     if domain and not _is_ip(domain):
         return domain
     return None
