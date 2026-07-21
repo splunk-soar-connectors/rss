@@ -21,6 +21,7 @@ import json
 import os
 import socket
 import tempfile
+import unicodedata
 import urllib.parse
 import urllib.request
 from time import mktime
@@ -38,6 +39,10 @@ from parser_helper import parse_link_contents
 class RetVal(tuple):
     def __new__(cls, val1, val2):
         return tuple.__new__(RetVal, (val1, val2))
+
+
+def _sanitize_display_text(value):
+    return "".join(character for character in value if character != "\x00" and unicodedata.category(character) != "Cf")
 
 
 def _validate_public_http_url(url):
@@ -171,7 +176,10 @@ class RssConnector(BaseConnector):
         last_successful_entry = None
         failure_message = None
         for entry in new_entries:
-            container = {"name": entry.title}
+            entry_title = entry.title[0] if type(entry.title) == list else entry.title
+            entry_title = _sanitize_display_text(entry_title)
+            entry_link = _sanitize_display_text(entry.link)
+            container = {"name": entry_title}
 
             try:
                 # Get html page
@@ -196,10 +204,9 @@ class RssConnector(BaseConnector):
                 # We are also going to add the link as an artifact
                 artifacts = artifacts[0 : self._max_artifacts - 1]
 
-            artifacts.append({"cef": {"requestURL": entry.link}, "name": "Entry URL"})
+            artifacts.append({"cef": {"requestURL": entry_link}, "name": "Entry URL"})
 
-            title = entry.title[0] if type(entry.title) == list else entry.title
-            title = title.encode("ascii", "ignore")
+            title = entry_title.encode("ascii", "ignore")
             source_data_identifier = hashlib.sha256(title + str(mktime(entry.published_parsed)).encode("ascii")).hexdigest()
 
             container["artifacts"] = artifacts
@@ -211,7 +218,7 @@ class RssConnector(BaseConnector):
                 break
 
             if self.save_html:
-                resp, msg = self._save_html(resp_content, entry.title, cid)
+                resp, msg = self._save_html(resp_content, entry_title, cid)
                 if phantom.is_fail(resp):
                     failure_message = f"Error saving file to vault: {msg}"
                     break
