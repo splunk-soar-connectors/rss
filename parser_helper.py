@@ -70,8 +70,7 @@ def parse_file(base_connector, file_contents, file_type):
         return ret_val, msg, None
 
     cve = {"cef": "cve", "pattern": r"CVE-\d{4}-\d+", "name": "CVE Artifact"}
-    patterns = TextIOCParser.BASE_PATTERNS
-    patterns.append(cve)
+    patterns = [*TextIOCParser.BASE_PATTERNS, cve]
 
     tiocp = TextIOCParser(patterns=patterns)
     try:

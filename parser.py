@@ -145,10 +145,11 @@ class TextIOCParser:
             ],
         },
     ]
-    found_values = set()
 
     def __init__(self, patterns=None):
-        self.patterns = self.BASE_PATTERNS if patterns is None else patterns
+        pattern_definitions = self.BASE_PATTERNS if patterns is None else patterns
+        self.patterns = [dict(pattern) for pattern in pattern_definitions]
+        self.found_values = set()
         self.added_artifacts = 0
 
     def _create_artifact(self, artifacts, value, cef, name):

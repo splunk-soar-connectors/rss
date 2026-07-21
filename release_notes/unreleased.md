@@ -6,3 +6,4 @@
 * Continued extracting feed indicators when malformed defanged URLs are present.
 * Extracted only complete standalone IPv6 indicators from feed content.
 * Removed hidden format-control characters from feed-derived display values.
+* Kept IOC parsing state and CVE pattern definitions isolated to each feed entry.
