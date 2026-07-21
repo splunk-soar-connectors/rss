@@ -28,7 +28,7 @@ EMAIL_REGEX = r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"
 EMAIL_REGEX2 = r'".*"@[A-Z0-9.-]+\.[A-Z]{2,}\b'
 HASH_REGEX = r"\b[0-9a-fA-F]{32}\b|\b[0-9a-fA-F]{40}\b|\b[0-9a-fA-F]{64}\b"
 IP_REGEX = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
-IPV6_REGEX = r"\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|"
+IPV6_REGEX = r"(?<![0-9A-Fa-f:.])((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|"
 IPV6_REGEX += r"(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))"
 IPV6_REGEX += (
     r"|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)"
@@ -54,6 +54,9 @@ IPV6_REGEX += (
     r"(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)"
     r"(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*"
 )
+
+
+IPV6_REGEX = IPV6_REGEX.removesuffix(r"\s*") + r"(?![0-9A-Fa-f:])"
 
 
 def _extract_domain_from_url(url):
@@ -183,11 +186,6 @@ class TextIOCParser:
         artifacts = []
         for ioc in self.patterns:
             regexp = re.compile(ioc["pattern"], re.IGNORECASE)
-            found = regexp.findall(text)
-            for match in found:
-                if type(match) == tuple:
-                    for x in match:
-                        self._pass_over_value(artifacts, x, ioc)
-                else:
-                    self._pass_over_value(artifacts, match, ioc)
+            for match in regexp.finditer(text):
+                self._pass_over_value(artifacts, match.group(0).strip(), ioc)
         return artifacts
