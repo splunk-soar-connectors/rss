@@ -1,6 +1,6 @@
 # File: rss_connector.py
 #
-# Copyright (c) 2017-2025 Splunk Inc.
+# Copyright (c) 2017-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
 #
 # Phantom App imports
 import hashlib
+import ipaddress
 import json
 import os
+import socket
 import tempfile
+import unicodedata
+import urllib.parse
 import urllib.request
 from time import mktime
 
@@ -35,6 +39,32 @@ from parser_helper import parse_link_contents
 class RetVal(tuple):
     def __new__(cls, val1, val2):
         return tuple.__new__(RetVal, (val1, val2))
+
+
+def _sanitize_display_text(value):
+    return "".join(character for character in value if character != "\x00" and unicodedata.category(character) != "Cf")
+
+
+def _validate_public_http_url(url):
+    parsed_url = urllib.parse.urlsplit(url)
+    if parsed_url.scheme not in {"http", "https"}:
+        raise ValueError("URL must use HTTP or HTTPS")
+    if not parsed_url.hostname or parsed_url.username or parsed_url.password:
+        raise ValueError("URL must contain a hostname without credentials")
+
+    try:
+        addresses = socket.getaddrinfo(parsed_url.hostname, parsed_url.port, type=socket.SOCK_STREAM)
+    except (OSError, ValueError) as e:
+        raise ValueError("URL hostname could not be resolved") from e
+
+    if not addresses or any(not ipaddress.ip_address(address[4][0]).is_global for address in addresses):
+        raise ValueError("URL hostname must resolve only to public addresses")
+
+
+class _PublicHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        _validate_public_http_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 class RssConnector(BaseConnector):
@@ -106,7 +136,7 @@ class RssConnector(BaseConnector):
         # PAPP-26990 remove any relative paths from name
         name = os.path.basename(name.strip("/"))
 
-        success, message, vault_id = ph_rules.vault_add(container_id, path, name)
+        success, message, _vault_id = ph_rules.vault_add(container_id, path, name)
         if success:
             return phantom.APP_SUCCESS, None
         return phantom.APP_ERROR, message
@@ -124,15 +154,10 @@ class RssConnector(BaseConnector):
 
         self.save_progress(
             "Parsing {} entries from {}".format(
-                "all" if self._max_containers == 0 else f"latest {self._max_containers}", self._feed["feed"]["title"]
+                "all" if self._max_containers == 0 else f"up to {self._max_containers} new", self._feed["feed"]["title"]
             )
         )
         self.save_progress("Saving {} artifacts per entry".format("all" if self._max_artifacts == 0 else self._max_artifacts))
-
-        if self._max_containers:
-            entries = self._feed.entries[0 : self._max_containers]
-        else:
-            entries = self._feed.entries
 
         try:
             last_checked_entry = self._state["last_checked_entry"]
@@ -143,41 +168,45 @@ class RssConnector(BaseConnector):
             if last_checked_entry["feed_url"] != self._feed_url:
                 last_checked_entry = {"timestamp": 0.0, "feed_url": self._feed_url}
 
-        new_entries = []
-        for entry in entries:
-            if self._cmp_with_last_checked_entry(entry, last_checked_entry):
-                break
-            new_entries.append(entry)
+        new_entries = [entry for entry in self._feed.entries if not self._cmp_with_last_checked_entry(entry, last_checked_entry)]
+        new_entries.sort(key=lambda entry: mktime(entry.published_parsed))
+        if self._max_containers:
+            new_entries = new_entries[: self._max_containers]
 
-        # Reverse so latest article shows up first
-        new_entries = list(reversed(new_entries))
-
+        last_successful_entry = None
+        failure_message = None
         for entry in new_entries:
-            container = {"name": entry.title}
+            entry_title = entry.title[0] if type(entry.title) == list else entry.title
+            entry_title = _sanitize_display_text(entry_title)
+            entry_link = _sanitize_display_text(entry.link)
+            container = {"name": entry_title}
 
             try:
                 # Get html page
+                _validate_public_http_url(entry.link)
                 request = urllib.request.Request(entry.link, headers={"User-Agent": "Chrome 41.0.2227.0"})
-                resp_content = urllib.request.urlopen(request).read()
+                opener = urllib.request.build_opener(_PublicHTTPRedirectHandler())
+                resp_content = opener.open(request).read()
             except Exception as e:
                 self.debug_print(f"Cannot read: {entry.link}")
                 self.debug_print(f"Exception: {e!s}")
-                continue
+                failure_message = f"Error retrieving link: {entry.link}"
+                break
 
             ret_val, msg, artifacts = parse_link_contents(self, resp_content)
             if phantom.is_fail(ret_val):
                 self.save_progress(f"Error processing link: {entry.link}")
                 self.save_progress(f"Error: {msg}")
-                continue
+                failure_message = f"Error processing link: {entry.link}"
+                break
 
             if self._max_artifacts:
                 # We are also going to add the link as an artifact
                 artifacts = artifacts[0 : self._max_artifacts - 1]
 
-            artifacts.append({"cef": {"requestURL": entry.link}, "name": "Entry URL"})
+            artifacts.append({"cef": {"requestURL": entry_link}, "name": "Entry URL"})
 
-            title = entry.title[0] if type(entry.title) == list else entry.title
-            title = title.encode("ascii", "ignore")
+            title = entry_title.encode("ascii", "ignore")
             source_data_identifier = hashlib.sha256(title + str(mktime(entry.published_parsed)).encode("ascii")).hexdigest()
 
             container["artifacts"] = artifacts
@@ -185,17 +214,24 @@ class RssConnector(BaseConnector):
 
             ret_val, msg, cid = self.save_container(container)
             if phantom.is_fail(ret_val):
-                return self.set_status(phantom.APP_ERROR, f"Error saving container: {msg}")
+                failure_message = f"Error saving container: {msg}"
+                break
 
             if self.save_html:
-                resp, msg = self._save_html(resp_content, entry.title, cid)
+                resp, msg = self._save_html(resp_content, entry_title, cid)
                 if phantom.is_fail(resp):
-                    return self.set_status(phantom.APP_ERROR, f"Error saving file to vault: {msg}")
+                    failure_message = f"Error saving file to vault: {msg}"
+                    break
+
+            last_successful_entry = entry
 
         if not self.is_poll_now():
-            if len(new_entries) > 0:
-                last_checked_entry["timestamp"] = mktime(new_entries[-1].published_parsed)
+            if last_successful_entry is not None:
+                last_checked_entry["timestamp"] = mktime(last_successful_entry.published_parsed)
                 self._state["last_checked_entry"] = last_checked_entry
+
+        if failure_message:
+            return self.set_status(phantom.APP_ERROR, failure_message)
 
         return self.set_status(phantom.APP_SUCCESS)
 

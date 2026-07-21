@@ -1,6 +1,6 @@
 # File: parser.py
 #
-# Copyright (c) 2017-2025 Splunk Inc.
+# Copyright (c) 2017-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ _container_common = {
     "run_automation": False  # Don't run any playbooks, when this artifact is added
 }
 
-URI_REGEX = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+URI_REGEX = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|[^ -@[-`{-~\s]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 EMAIL_REGEX = r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"
 EMAIL_REGEX2 = r'".*"@[A-Z0-9.-]+\.[A-Z]{2,}\b'
 HASH_REGEX = r"\b[0-9a-fA-F]{32}\b|\b[0-9a-fA-F]{40}\b|\b[0-9a-fA-F]{64}\b"
 IP_REGEX = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
-IPV6_REGEX = r"\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|"
+IPV6_REGEX = r"(?<![0-9A-Fa-f:.])((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|"
 IPV6_REGEX += r"(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))"
 IPV6_REGEX += (
     r"|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)"
@@ -56,8 +56,14 @@ IPV6_REGEX += (
 )
 
 
+IPV6_REGEX = IPV6_REGEX.removesuffix(r"\s*") + r"(?![0-9A-Fa-f:])"
+
+
 def _extract_domain_from_url(url):
-    domain = phantom.get_host_from_url(url)
+    try:
+        domain = phantom.get_host_from_url(url)
+    except ValueError:
+        return None
     if domain and not _is_ip(domain):
         return domain
     return None
@@ -139,10 +145,11 @@ class TextIOCParser:
             ],
         },
     ]
-    found_values = set()
 
     def __init__(self, patterns=None):
-        self.patterns = self.BASE_PATTERNS if patterns is None else patterns
+        pattern_definitions = self.BASE_PATTERNS if patterns is None else patterns
+        self.patterns = [dict(pattern) for pattern in pattern_definitions]
+        self.found_values = set()
         self.added_artifacts = 0
 
     def _create_artifact(self, artifacts, value, cef, name):
@@ -180,11 +187,6 @@ class TextIOCParser:
         artifacts = []
         for ioc in self.patterns:
             regexp = re.compile(ioc["pattern"], re.IGNORECASE)
-            found = regexp.findall(text)
-            for match in found:
-                if type(match) == tuple:
-                    for x in match:
-                        self._pass_over_value(artifacts, x, ioc)
-                else:
-                    self._pass_over_value(artifacts, match, ioc)
+            for match in regexp.finditer(text):
+                self._pass_over_value(artifacts, match.group(0).strip(), ioc)
         return artifacts
