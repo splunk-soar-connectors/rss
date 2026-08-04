@@ -16,9 +16,11 @@
 #
 # Phantom App imports
 import hashlib
+import hmac
 import ipaddress
 import json
 import os
+import secrets
 import socket
 import tempfile
 import unicodedata
@@ -239,7 +241,16 @@ class RssConnector(BaseConnector):
             artifacts.append({"cef": {"requestURL": entry_link}, "name": "Entry URL"})
 
             title = entry_title.encode("ascii", "ignore")
-            source_data_identifier = hashlib.sha256(title + str(mktime(entry.published_parsed)).encode("ascii")).hexdigest()
+            sdi_key = self._state.get("sdi_hmac_key")
+            if not sdi_key:
+                sdi_key = secrets.token_hex(32)
+                self._state["sdi_hmac_key"] = sdi_key
+                self.save_state(self._state)
+            source_data_identifier = hmac.new(
+                sdi_key.encode("ascii"),
+                title + str(mktime(entry.published_parsed)).encode("ascii"),
+                hashlib.sha256,
+            ).hexdigest()
 
             container["artifacts"] = artifacts
             container["source_data_identifier"] = source_data_identifier
