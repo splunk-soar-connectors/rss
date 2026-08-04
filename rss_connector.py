@@ -80,7 +80,17 @@ class RssConnector(BaseConnector):
         self.save_html = False
 
     def _init_feed(self):
-        self._feed = feedparser.parse(self._feed_url)
+        default_timeout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(rc.RSS_DEFAULT_TIMEOUT)
+        try:
+            self._feed = feedparser.parse(self._feed_url)
+        except Exception as e:
+            self.save_progress(f"Error reading feed: {e!s}")
+            self.save_progress("Is this an RSS Feed?")
+            self.is_test_connectivity()
+            return phantom.APP_ERROR
+        finally:
+            socket.setdefaulttimeout(default_timeout)
         if self._feed.bozo == 1:
             ex_type = type(self._feed.bozo_exception)
             if self._ignore_perrors and ex_type is feedparser.CharacterEncodingOverride:
