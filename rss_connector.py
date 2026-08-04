@@ -67,6 +67,27 @@ class _PublicHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
+def _read_bounded_response(response):
+    content_length = response.headers.get("Content-Length")
+    if content_length is not None:
+        try:
+            declared_size = int(content_length)
+        except (TypeError, ValueError) as e:
+            raise ValueError("Response contains an invalid Content-Length") from e
+        if declared_size > rc.RSS_MAX_DOWNLOAD_SIZE:
+            raise ValueError("Response exceeds the maximum allowed download size")
+
+    content = bytearray()
+    while len(content) <= rc.RSS_MAX_DOWNLOAD_SIZE:
+        remaining = rc.RSS_MAX_DOWNLOAD_SIZE + 1 - len(content)
+        chunk = response.read(min(rc.RSS_READ_CHUNK_SIZE, remaining))
+        if not chunk:
+            return bytes(content)
+        content.extend(chunk)
+
+    raise ValueError("Response exceeds the maximum allowed download size")
+
+
 class RssConnector(BaseConnector):
     def __init__(self):
         super().__init__()
@@ -196,7 +217,8 @@ class RssConnector(BaseConnector):
                 _validate_public_http_url(entry.link)
                 request = urllib.request.Request(entry.link, headers={"User-Agent": "Chrome 41.0.2227.0"})
                 opener = urllib.request.build_opener(_PublicHTTPRedirectHandler())
-                resp_content = opener.open(request).read()
+                with opener.open(request, timeout=rc.RSS_DEFAULT_TIMEOUT) as response:
+                    resp_content = _read_bounded_response(response)
             except Exception as e:
                 self.debug_print(f"Cannot read: {entry.link}")
                 self.debug_print(f"Exception: {e!s}")
