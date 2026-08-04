@@ -9,3 +9,5 @@
 * Defer future-dated feed entries and reset future poll checkpoints before selecting new entries.
 
 * Extract IOC URLs from HTML src attributes in feed-linked pages.
+
+* Preserve standards-valid tilde characters when extracting URLs from feed-linked content.
