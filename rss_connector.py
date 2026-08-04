@@ -26,7 +26,7 @@ import tempfile
 import unicodedata
 import urllib.parse
 import urllib.request
-from time import mktime
+from time import mktime, time
 
 import feedparser
 import phantom.app as phantom
@@ -201,7 +201,17 @@ class RssConnector(BaseConnector):
             if last_checked_entry["feed_url"] != self._feed_url:
                 last_checked_entry = {"timestamp": 0.0, "feed_url": self._feed_url}
 
-        new_entries = [entry for entry in self._feed.entries if not self._cmp_with_last_checked_entry(entry, last_checked_entry)]
+        now = time()
+        if last_checked_entry["timestamp"] > now:
+            self.debug_print("Persisted feed checkpoint is in the future; resetting it")
+            last_checked_entry["timestamp"] = 0.0
+            self._state["last_checked_entry"] = last_checked_entry
+
+        new_entries = [
+            entry
+            for entry in self._feed.entries
+            if mktime(entry.published_parsed) <= now and not self._cmp_with_last_checked_entry(entry, last_checked_entry)
+        ]
         new_entries.sort(key=lambda entry: mktime(entry.published_parsed))
         if self._max_containers:
             new_entries = new_entries[: self._max_containers]
