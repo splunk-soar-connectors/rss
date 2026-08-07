@@ -18,3 +18,5 @@ RSS_TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed"
 RSS_TEST_CONNECTIVITY_FAILED = "Test Connectivity Failed"
 RSS_ARTIFACTS_CONTAINERS_VALIDATION_FAILED = "Kindly provide a positive integer for max_containers and max_artifacts parameters"
 RSS_DEFAULT_TIMEOUT = 30
+RSS_MAX_DOWNLOAD_SIZE = 50 * 1024 * 1024
+RSS_READ_CHUNK_SIZE = 64 * 1024

@@ -38,9 +38,9 @@ def _html_to_text(html_text):
         read_text = soup.findAll(text=True)
         visible_text = filter(visible_tags, read_text)
         text = " ".join(t.strip() for t in visible_text)
-        hrefs = soup.findAll("a", href=True)
-        # pylint: disable=invalid-sequence-index
-        text += " ".join(x["href"] for x in hrefs)
+        hrefs = [tag.get("href") for tag in soup.findAll("a", href=True)]
+        srcs = [tag.get("src") for tag in soup.findAll(src=True)]
+        text += " " + " ".join(hrefs + srcs)
     except Exception as e:
         return phantom.APP_ERROR, f"Error parsing html: {e!s}", None
     return phantom.APP_SUCCESS, None, text

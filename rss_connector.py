@@ -16,15 +16,17 @@
 #
 # Phantom App imports
 import hashlib
+import hmac
 import ipaddress
 import json
 import os
+import secrets
 import socket
 import tempfile
 import unicodedata
 import urllib.parse
 import urllib.request
-from time import mktime
+from time import mktime, time
 
 import feedparser
 import phantom.app as phantom
@@ -67,6 +69,27 @@ class _PublicHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
+def _read_bounded_response(response):
+    content_length = response.headers.get("Content-Length")
+    if content_length is not None:
+        try:
+            declared_size = int(content_length)
+        except (TypeError, ValueError) as e:
+            raise ValueError("Response contains an invalid Content-Length") from e
+        if declared_size > rc.RSS_MAX_DOWNLOAD_SIZE:
+            raise ValueError("Response exceeds the maximum allowed download size")
+
+    content = bytearray()
+    while len(content) <= rc.RSS_MAX_DOWNLOAD_SIZE:
+        remaining = rc.RSS_MAX_DOWNLOAD_SIZE + 1 - len(content)
+        chunk = response.read(min(rc.RSS_READ_CHUNK_SIZE, remaining))
+        if not chunk:
+            return bytes(content)
+        content.extend(chunk)
+
+    raise ValueError("Response exceeds the maximum allowed download size")
+
+
 class RssConnector(BaseConnector):
     def __init__(self):
         super().__init__()
@@ -80,7 +103,17 @@ class RssConnector(BaseConnector):
         self.save_html = False
 
     def _init_feed(self):
-        self._feed = feedparser.parse(self._feed_url)
+        default_timeout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(rc.RSS_DEFAULT_TIMEOUT)
+        try:
+            self._feed = feedparser.parse(self._feed_url)
+        except Exception as e:
+            self.save_progress(f"Error reading feed: {e!s}")
+            self.save_progress("Is this an RSS Feed?")
+            self.is_test_connectivity()
+            return phantom.APP_ERROR
+        finally:
+            socket.setdefaulttimeout(default_timeout)
         if self._feed.bozo == 1:
             ex_type = type(self._feed.bozo_exception)
             if self._ignore_perrors and ex_type is feedparser.CharacterEncodingOverride:
@@ -168,7 +201,17 @@ class RssConnector(BaseConnector):
             if last_checked_entry["feed_url"] != self._feed_url:
                 last_checked_entry = {"timestamp": 0.0, "feed_url": self._feed_url}
 
-        new_entries = [entry for entry in self._feed.entries if not self._cmp_with_last_checked_entry(entry, last_checked_entry)]
+        now = time()
+        if last_checked_entry["timestamp"] > now:
+            self.debug_print("Persisted feed checkpoint is in the future; resetting it")
+            last_checked_entry["timestamp"] = 0.0
+            self._state["last_checked_entry"] = last_checked_entry
+
+        new_entries = [
+            entry
+            for entry in self._feed.entries
+            if mktime(entry.published_parsed) <= now and not self._cmp_with_last_checked_entry(entry, last_checked_entry)
+        ]
         new_entries.sort(key=lambda entry: mktime(entry.published_parsed))
         if self._max_containers:
             new_entries = new_entries[: self._max_containers]
@@ -186,7 +229,8 @@ class RssConnector(BaseConnector):
                 _validate_public_http_url(entry.link)
                 request = urllib.request.Request(entry.link, headers={"User-Agent": "Chrome 41.0.2227.0"})
                 opener = urllib.request.build_opener(_PublicHTTPRedirectHandler())
-                resp_content = opener.open(request).read()
+                with opener.open(request, timeout=rc.RSS_DEFAULT_TIMEOUT) as response:
+                    resp_content = _read_bounded_response(response)
             except Exception as e:
                 self.debug_print(f"Cannot read: {entry.link}")
                 self.debug_print(f"Exception: {e!s}")
@@ -207,7 +251,16 @@ class RssConnector(BaseConnector):
             artifacts.append({"cef": {"requestURL": entry_link}, "name": "Entry URL"})
 
             title = entry_title.encode("ascii", "ignore")
-            source_data_identifier = hashlib.sha256(title + str(mktime(entry.published_parsed)).encode("ascii")).hexdigest()
+            sdi_key = self._state.get("sdi_hmac_key")
+            if not sdi_key:
+                sdi_key = secrets.token_hex(32)
+                self._state["sdi_hmac_key"] = sdi_key
+                self.save_state(self._state)
+            source_data_identifier = hmac.new(
+                sdi_key.encode("ascii"),
+                title + str(mktime(entry.published_parsed)).encode("ascii"),
+                hashlib.sha256,
+            ).hexdigest()
 
             container["artifacts"] = artifacts
             container["source_data_identifier"] = source_data_identifier
