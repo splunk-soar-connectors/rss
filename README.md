@@ -1,7 +1,7 @@
 # RSS
 
 Publisher: Splunk <br>
-Connector Version: 2.2.5 <br>
+Connector Version: 2.2.6 <br>
 Product Vendor: Generic <br>
 Product Name: RSS <br>
 Minimum Product Version: 6.1.1
